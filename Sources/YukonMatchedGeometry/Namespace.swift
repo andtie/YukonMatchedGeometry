@@ -1,17 +1,18 @@
 //
 //  Namespace.swift
-//  MatchedGeometry
+// 
 //
-//  Created by Tielmann, Andreas (DE - Duesseldorf) on 07.07.2020.
-//  Copyright © 2020 Tielmann. All rights reserved.
+//  Created by Tielmann, Andreas on 07.07.2020.
 //
 
 import SwiftUI
 
 @propertyWrapper public struct Namespace: DynamicProperty {
 
+    // swiftlint:disable:next type_name
     public class ID {
-        var value = MatchedGeometryPreference.defaultValue
+        var sourceFrames = [AnyHashable: CGRect]()
+        var sourceAnchors = [AnyHashable: UnitPoint]()
     }
 
     public let wrappedValue = ID()

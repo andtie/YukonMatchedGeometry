@@ -1,22 +1,19 @@
 //
 //  MatchedGeometryPreference.swift
-//  MatchedGeometry
+// 
 //
-//  Created by Tielmann, Andreas (DE - Duesseldorf) on 07.07.2020.
-//  Copyright © 2020 Tielmann. All rights reserved.
+//  Created by Tielmann, Andreas on 07.07.2020.
 //
 
 import SwiftUI
 
 struct MatchedGeometryPreference: PreferenceKey {
 
-    typealias Value = [AnyHashable: CGRect]
+    typealias Value = CGRect?
 
-    static var defaultValue: Value { [:] }
+    static var defaultValue: Value = nil
 
     static func reduce(value: inout Value, nextValue: () -> Value) {
-        for (id, frame) in nextValue() {
-            value[id] = frame
-        }
+        value = nextValue()
     }
 }

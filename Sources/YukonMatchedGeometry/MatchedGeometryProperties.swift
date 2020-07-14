@@ -1,9 +1,8 @@
 //
 //  MatchedGeometryProperties.swift
-//  MatchedGeometry
+// 
 //
-//  Created by Tielmann, Andreas (DE - Duesseldorf) on 07.07.2020.
-//  Copyright © 2020 Tielmann. All rights reserved.
+//  Created by Tielmann, Andreas on 07.07.2020.
 //
 
 import Foundation
@@ -14,8 +13,6 @@ public struct MatchedGeometryProperties: OptionSet {
     public init(rawValue: UInt32) {
         self.rawValue = rawValue
     }
-
-    // TODO: compare with the rawValues in iOS 14
 
     /// The view's position, in window coordinates.
     public static let position = MatchedGeometryProperties(rawValue: 1 << 0)
