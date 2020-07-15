@@ -23,18 +23,6 @@ struct MatchedGeometryConfig<ID: Hashable>: Equatable {
     let anchor: UnitPoint
     let isSource: Bool
 
-    var sourceFrame: CGRect? {
-        namespace.sourceFrames[id]
-    }
-
-    var sourceAnchor: UnitPoint {
-        namespace.sourceAnchors[id] ?? .center
-    }
-
-    var scaleAnchor: UnitPoint {
-        properties.contains(.position) ? .center : .topLeading
-    }
-
     func save(frame: CGRect?) {
         if isSource, let frame = frame, namespace.sourceFrames[id] != frame {
             namespace.sourceFrames[id] = frame
@@ -42,56 +30,20 @@ struct MatchedGeometryConfig<ID: Hashable>: Equatable {
         }
     }
 
-    func scale(_ frame: CGRect?, progress: CGFloat) -> CGSize {
+    func parameters(for frame: CGRect?) -> MatchedGeometryParameters? {
         guard
             !isSource,
-            properties.contains(.size),
             let frame = frame,
-            let sourceFrame = sourceFrame else {
-                return CGSize(width: 1, height: 1)
+            let sourceFrame = namespace.sourceFrames[id],
+            let sourceAnchor = namespace.sourceAnchors[id] else {
+                return nil
         }
-
-        let interpolatedSize = CGSize(
-            width: progress * frame.width + (1 - progress) * sourceFrame.width,
-            height: progress * frame.height + (1 - progress) * sourceFrame.height
+        return MatchedGeometryParameters(
+            frame: frame,
+            sourceFrame: sourceFrame,
+            properties: properties,
+            anchor: anchor,
+            sourceAnchor: sourceAnchor
         )
-
-        return CGSize(
-            width: frame.width == 0 ? 1 : interpolatedSize.width / frame.width,
-            height: frame.height == 0 ? 1 : interpolatedSize.height / frame.height
-        )
-    }
-
-    func offset(_ frame: CGRect?, progress: CGFloat) -> CGSize {
-        guard
-            !isSource,
-            properties.contains(.position),
-            let frame = frame,
-            var sourceFrame = sourceFrame else {
-                return .zero
-        }
-
-        if !properties.contains(.frame) {
-            sourceFrame.size = frame.size
-        }
-
-        let interpolatedPoint = CGPoint(
-            x: progress * frame.x(for: anchor) + (1 - progress) * sourceFrame.x(for: sourceAnchor),
-            y: progress * frame.y(for: anchor) + (1 - progress) * sourceFrame.y(for: sourceAnchor)
-        )
-
-        return CGSize(
-            width: (interpolatedPoint.x - frame.x(for: anchor)),
-            height: (interpolatedPoint.y - frame.y(for: anchor))
-        )
-    }
-}
-
-extension CGRect {
-    func x(for anchor: UnitPoint) -> CGFloat {
-        minX + width * anchor.x
-    }
-    func y(for anchor: UnitPoint) -> CGFloat {
-        minY + height * anchor.y
     }
 }

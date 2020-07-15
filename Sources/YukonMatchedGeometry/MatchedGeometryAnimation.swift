@@ -7,9 +7,8 @@
 
 import SwiftUI
 
-struct MatchedGeometryAnimation<ID: Hashable>: AnimatableModifier {
-    let config: MatchedGeometryConfig<ID>
-    let frame: CGRect?
+struct MatchedGeometryAnimation: AnimatableModifier {
+    let params: () -> MatchedGeometryParameters?
     var progress: CGFloat
 
     var animatableData: CGFloat {
@@ -18,8 +17,13 @@ struct MatchedGeometryAnimation<ID: Hashable>: AnimatableModifier {
     }
 
     func body(content: Content) -> some View {
+        let params = self.params()
         return content
-            .scaleEffect(config.scale(frame, progress: progress), anchor: config.scaleAnchor)
-            .offset(config.offset(frame, progress: progress))
+            .scaleEffect(
+                params?.scale(progress: progress) ?? CGSize(width: 1, height: 1),
+                anchor: params?.scaleAnchor ?? .center
+            )
+            .offset(params?.offset(progress: progress) ?? .zero)
+//            .opacity(isTransition ? Double(progress) : 1)
     }
 }

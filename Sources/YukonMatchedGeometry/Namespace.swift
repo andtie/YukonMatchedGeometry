@@ -13,6 +13,8 @@ import SwiftUI
     public class ID {
         var sourceFrames = [AnyHashable: CGRect]()
         var sourceAnchors = [AnyHashable: UnitPoint]()
+        var insertionFrames = [AnyHashable: [Bool: CGRect]]()
+        var insertionAnchors = [AnyHashable: [UnitPoint]]()
     }
 
     public let wrappedValue = ID()
