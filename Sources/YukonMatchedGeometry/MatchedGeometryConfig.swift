@@ -24,10 +24,19 @@ struct MatchedGeometryConfig<ID: Hashable>: Equatable {
     let isSource: Bool
 
     func save(frame: CGRect?) {
-        if isSource, let frame = frame, namespace.sourceFrames[id] != frame {
+        guard isSource, let frame = frame else { return }
+        if namespace.sourceFrames[id] != frame {
             namespace.sourceFrames[id] = frame
             namespace.sourceAnchors[id] = anchor
         }
+    }
+
+    func save(transitionFrame frame: CGRect?, key: Bool) {
+        guard isSource, let frame = frame else { return }
+        let dict = namespace.insertionFrames[id]
+        if dict?[key] != nil && dict?[key] != dict?[!key] { return }
+        namespace.update(id: id, key: key, frame: frame)
+        namespace.update(id: id, key: key, anchor: anchor)
     }
 
     func parameters(for frame: CGRect?) -> MatchedGeometryParameters? {
@@ -45,5 +54,22 @@ struct MatchedGeometryConfig<ID: Hashable>: Equatable {
             anchor: anchor,
             sourceAnchor: sourceAnchor
         )
+    }
+
+    func transitionParameters(for frame: CGRect?, key: Bool) -> MatchedGeometryParameters? {
+        guard
+            let frame = namespace.insertionFrames[id]?[key],
+            let sourceFrame = namespace.insertionFrames[id]?[!key],
+            let sourceAnchor = namespace.insertionAnchors[id]?[!key] else {
+                return nil
+        }
+        let params = MatchedGeometryParameters(
+            frame: frame,
+            sourceFrame: sourceFrame,
+            properties: properties,
+            anchor: anchor,
+            sourceAnchor: sourceAnchor
+        )
+        return params
     }
 }
