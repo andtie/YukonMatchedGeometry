@@ -48,10 +48,17 @@ struct MatchedGeometryModifier<ID: Hashable>: ViewModifier {
                     self.frame = value
                 }
             )
-            .onDisappear {
-                self.newConfig.namespace.insertionFrames[self.newConfig.id] = [:]
-                self.newConfig.namespace.insertionAnchors[self.newConfig.id] = [:]
+            .onPreferenceChange(AnimationTypePreference.self) { value in
+                resetInsertion()
             }
+            .onDisappear {
+                resetInsertion()
+            }
+    }
+
+    func resetInsertion() {
+        newConfig.namespace.insertionFrames[self.newConfig.id] = [:]
+        newConfig.namespace.insertionAnchors[self.newConfig.id] = [:]
     }
 
     func params(_ config: MatchedGeometryConfig<ID>) -> (Bool) -> MatchedGeometryParameters? {
