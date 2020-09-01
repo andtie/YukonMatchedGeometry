@@ -23,12 +23,12 @@ struct MatchedGeometryConfig<ID: Hashable>: Equatable {
     let anchor: UnitPoint
     let isSource: Bool
 
-    func save(frame: CGRect?) {
+    func update(frame: CGRect?) {
         guard isSource, let frame = frame else { return }
         namespace.sources[id] = Namespace.ViewInfo(frame: frame, anchor: anchor)
     }
 
-    func save(transitionFrame frame: CGRect?, uuid: UUID) {
+    func update(transitionFrame frame: CGRect?, uuid: UUID) {
         guard isSource,
               let frame = frame,
               let keyCount = namespace.transitions[id]?.keys.count,
@@ -49,24 +49,24 @@ struct MatchedGeometryConfig<ID: Hashable>: Equatable {
         return MatchedGeometryParameters(
             frame: frame,
             sourceFrame: source.frame,
-            properties: properties,
             anchor: anchor,
-            sourceAnchor: source.anchor
+            sourceAnchor: source.anchor,
+            properties: properties
         )
     }
 
     func transitionParameters(for frame: CGRect?, uuid: UUID) -> MatchedGeometryParameters {
         guard let dict = namespace.transitions[id],
               let info = dict[uuid],
-              let sourceInfo = dict.first(where: { $0.key != uuid })?.value else {
+              let source = dict.first(where: { $0.key != uuid })?.value else {
             return .zero
         }
         return MatchedGeometryParameters(
             frame: info.frame,
-            sourceFrame: sourceInfo.frame,
-            properties: [properties],
+            sourceFrame: source.frame,
             anchor: info.anchor,
-            sourceAnchor: sourceInfo.anchor
+            sourceAnchor: source.anchor,
+            properties: properties
         )
     }
 }

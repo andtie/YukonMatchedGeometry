@@ -18,11 +18,12 @@ struct MatchedGeometryAnimation: AnimatableModifier {
     }
 
     func body(content: Content) -> some View {
-        content
+        let params = parameters()
+        return content
             .scaleEffect(
-                parameters().scale(progress: progress),
-                anchor: parameters().scaleAnchor
+                params.scale(progress: progress),
+                anchor: params.scaleAnchor
             )
-            .offset(parameters().offset(progress: progress))
+            .offset(params.offset(progress: progress))
     }
 }

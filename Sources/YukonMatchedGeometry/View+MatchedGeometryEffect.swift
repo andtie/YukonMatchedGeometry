@@ -10,13 +10,7 @@ import SwiftUI
 extension View {
     //swiftlint:disable:next identifier_name line_length
     public func matchedGeometryEffect<ID>(id: ID, in namespace: Namespace.ID, properties: MatchedGeometryProperties = .frame, anchor: UnitPoint = .center, isSource: Bool = true) -> some View where ID: Hashable {
-        let config = MatchedGeometryConfig(
-            id: id,
-            namespace: namespace,
-            properties: properties,
-            anchor: anchor,
-            isSource: isSource
-        )
+        let config = MatchedGeometryConfig(id: id, namespace: namespace, properties: properties, anchor: anchor, isSource: isSource)
         return modifier(MatchedGeometryModifier(newConfig: config, oldConfig: config))
     }
 }

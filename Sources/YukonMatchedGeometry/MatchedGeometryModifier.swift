@@ -65,16 +65,12 @@ struct MatchedGeometryModifier<ID: Hashable>: ViewModifier {
     }
 
     func parameters(config: MatchedGeometryConfig<ID>) -> () -> MatchedGeometryParameters {
-        config.save(frame: frame)
-
-        func parameters() -> MatchedGeometryParameters {
-            config.parameters(for: frame)
-        }
-        return parameters
+        config.update(frame: frame)
+        return { config.parameters(for: self.frame) }
     }
 
     func transitionParams() -> MatchedGeometryParameters {
-        newConfig.save(transitionFrame: frame, uuid: uuid)
+        newConfig.update(transitionFrame: frame, uuid: uuid)
         return newConfig.transitionParameters(for: frame, uuid: uuid)
     }
 }

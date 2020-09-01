@@ -11,9 +11,11 @@ struct MatchedGeometryParameters {
 
     let frame: CGRect
     let sourceFrame: CGRect
-    let properties: MatchedGeometryProperties
+
     let anchor: UnitPoint
     let sourceAnchor: UnitPoint
+
+    let properties: MatchedGeometryProperties
 
     var scaleAnchor: UnitPoint {
         properties.contains(.position) ? .center : .topLeading
@@ -59,9 +61,9 @@ struct MatchedGeometryParameters {
     static let zero = MatchedGeometryParameters(
         frame: .zero,
         sourceFrame: .zero,
-        properties: [],
         anchor: .center,
-        sourceAnchor: .center
+        sourceAnchor: .center,
+        properties: []
     )
 }
 
