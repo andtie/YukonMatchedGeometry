@@ -61,21 +61,20 @@ struct MatchedGeometryModifier<ID: Hashable>: ViewModifier {
     }
 
     func resetInsertion() {
-        newConfig.namespace.insertionFrames[self.newConfig.id] = [:]
-        newConfig.namespace.insertionAnchors[self.newConfig.id] = [:]
+        newConfig.namespace.transitions[self.newConfig.id] = [:]
     }
 
-    func parameters(config: MatchedGeometryConfig<ID>) -> () -> MatchedGeometryParameters? {
+    func parameters(config: MatchedGeometryConfig<ID>) -> () -> MatchedGeometryParameters {
         config.save(frame: frame)
 
-        func parameters() -> MatchedGeometryParameters? {
+        func parameters() -> MatchedGeometryParameters {
             config.parameters(for: frame)
         }
         return parameters
     }
 
-    func transitionParams() -> MatchedGeometryParameters? {
-        newConfig.save(insertionFrame: frame, uuid: uuid)
+    func transitionParams() -> MatchedGeometryParameters {
+        newConfig.save(transitionFrame: frame, uuid: uuid)
         return newConfig.transitionParameters(for: frame, uuid: uuid)
     }
 }

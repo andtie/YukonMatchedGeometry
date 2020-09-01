@@ -55,6 +55,14 @@ struct MatchedGeometryParameters {
             height: (interpolatedPoint.y - frame.y(for: anchor))
         )
     }
+
+    static let zero = MatchedGeometryParameters(
+        frame: .zero,
+        sourceFrame: .zero,
+        properties: [],
+        anchor: .center,
+        sourceAnchor: .center
+    )
 }
 
 extension CGRect {

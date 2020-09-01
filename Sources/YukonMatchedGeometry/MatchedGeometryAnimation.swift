@@ -10,23 +10,19 @@ import SwiftUI
 struct MatchedGeometryAnimation: AnimatableModifier {
 
     var progress: CGFloat
-    let parameters: () -> MatchedGeometryParameters?
+    let parameters: () -> MatchedGeometryParameters
 
     var animatableData: CGFloat {
         get { progress }
         set { progress = newValue }
     }
 
-    var params: MatchedGeometryParameters? {
-        parameters()
-    }
-
     func body(content: Content) -> some View {
         content
             .scaleEffect(
-                params?.scale(progress: progress) ?? CGSize(width: 1, height: 1),
-                anchor: params?.scaleAnchor ?? .center
+                parameters().scale(progress: progress),
+                anchor: parameters().scaleAnchor
             )
-            .offset(params?.offset(progress: progress) ?? .zero)
+            .offset(parameters().offset(progress: progress))
     }
 }

@@ -11,13 +11,16 @@ import SwiftUI
 
     // swiftlint:disable:next type_name
     public class ID {
-        var sourceFrames = [AnyHashable: CGRect]()
-        var sourceAnchors = [AnyHashable: UnitPoint]()
-        var insertionFrames = [AnyHashable: [UUID: CGRect]]()
-        var insertionAnchors = [AnyHashable: [UUID: UnitPoint]]()
+        var sources = [AnyHashable: ViewInfo]()
+        var transitions = [AnyHashable: [UUID: ViewInfo]]()
     }
 
     public let wrappedValue = ID()
 
     public init() {}
+
+    struct ViewInfo: Equatable {
+        let frame: CGRect
+        let anchor: UnitPoint
+    }
 }

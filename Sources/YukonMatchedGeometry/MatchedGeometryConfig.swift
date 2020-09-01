@@ -25,57 +25,48 @@ struct MatchedGeometryConfig<ID: Hashable>: Equatable {
 
     func save(frame: CGRect?) {
         guard isSource, let frame = frame else { return }
-        if namespace.sourceFrames[id] != frame {
-            namespace.sourceFrames[id] = frame
-            namespace.sourceAnchors[id] = anchor
+        namespace.sources[id] = Namespace.ViewInfo(frame: frame, anchor: anchor)
+    }
+
+    func save(transitionFrame frame: CGRect?, uuid: UUID) {
+        guard isSource,
+              let frame = frame,
+              let keyCount = namespace.transitions[id]?.keys.count,
+              keyCount < 2 else {
+            return
         }
+        var infoDict = namespace.transitions[id] ?? [:]
+        infoDict[uuid] = .init(frame: frame, anchor: anchor)
+        namespace.transitions[id] = infoDict
     }
 
-    func save(insertionFrame frame: CGRect?, uuid: UUID) {
-        guard isSource, let frame = frame else { return }
-        let values = Array((namespace.insertionFrames[id] ?? [:]).values)
-        guard values.first == values.last else { return }
-
-        var framesDict = namespace.insertionFrames[id] ?? [:]
-        framesDict[uuid] = frame
-        namespace.insertionFrames[id] = framesDict
-
-        var anchorsDict = namespace.insertionAnchors[id] ?? [:]
-        anchorsDict[uuid] = anchor
-        namespace.insertionAnchors[id] = anchorsDict
-    }
-
-    func parameters(for frame: CGRect?) -> MatchedGeometryParameters? {
-        guard
-            !isSource,
-            let frame = frame,
-            let sourceFrame = namespace.sourceFrames[id],
-            let sourceAnchor = namespace.sourceAnchors[id] else {
-                return nil
+    func parameters(for frame: CGRect?) -> MatchedGeometryParameters {
+        guard !isSource,
+              let frame = frame,
+              let source = namespace.sources[id] else {
+            return .zero
         }
         return MatchedGeometryParameters(
             frame: frame,
-            sourceFrame: sourceFrame,
+            sourceFrame: source.frame,
             properties: properties,
             anchor: anchor,
-            sourceAnchor: sourceAnchor
+            sourceAnchor: source.anchor
         )
     }
 
-    func transitionParameters(for frame: CGRect?, uuid: UUID) -> MatchedGeometryParameters? {
-        guard
-            let frame = namespace.insertionFrames[id]?[uuid],
-            let sourceFrame = namespace.insertionFrames[id]?.first(where: { $0.key != uuid })?.value,
-            let sourceAnchor = namespace.insertionAnchors[id]?.first(where: { $0.key != uuid })?.value else {
-                return nil
+    func transitionParameters(for frame: CGRect?, uuid: UUID) -> MatchedGeometryParameters {
+        guard let dict = namespace.transitions[id],
+              let info = dict[uuid],
+              let sourceInfo = dict.first(where: { $0.key != uuid })?.value else {
+            return .zero
         }
-        let params = MatchedGeometryParameters(
-            frame: frame,
-            sourceFrame: sourceFrame,
-            properties: properties,
-            anchor: anchor,
-            sourceAnchor: sourceAnchor
+        return MatchedGeometryParameters(
+            frame: info.frame,
+            sourceFrame: sourceInfo.frame,
+            properties: [properties],
+            anchor: info.anchor,
+            sourceAnchor: sourceInfo.anchor
         )
-        return params
     }
 }
