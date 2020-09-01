@@ -17,7 +17,7 @@ struct MatchedGeometryConfig<ID: Hashable>: Equatable {
             && lhs.isSource == rhs.isSource
     }
 
-    let id: ID
+    let id: ID //swiftlint:disable:this identifier_name
     let namespace: Namespace.ID
     let properties: MatchedGeometryProperties
     let anchor: UnitPoint
@@ -31,12 +31,18 @@ struct MatchedGeometryConfig<ID: Hashable>: Equatable {
         }
     }
 
-    func save(transitionFrame frame: CGRect?, key: Bool) {
+    func save(insertionFrame frame: CGRect?, uuid: UUID) {
         guard isSource, let frame = frame else { return }
-        let dict = namespace.insertionFrames[id]
-        if dict?[key] != nil && dict?[key] != dict?[!key] { return }
-        namespace.update(id: id, key: key, frame: frame)
-        namespace.update(id: id, key: key, anchor: anchor)
+        let values = Array((namespace.insertionFrames[id] ?? [:]).values)
+        guard values.first == values.last else { return }
+
+        var framesDict = namespace.insertionFrames[id] ?? [:]
+        framesDict[uuid] = frame
+        namespace.insertionFrames[id] = framesDict
+
+        var anchorsDict = namespace.insertionAnchors[id] ?? [:]
+        anchorsDict[uuid] = anchor
+        namespace.insertionAnchors[id] = anchorsDict
     }
 
     func parameters(for frame: CGRect?) -> MatchedGeometryParameters? {
@@ -56,11 +62,11 @@ struct MatchedGeometryConfig<ID: Hashable>: Equatable {
         )
     }
 
-    func transitionParameters(for frame: CGRect?, key: Bool) -> MatchedGeometryParameters? {
+    func transitionParameters(for frame: CGRect?, uuid: UUID) -> MatchedGeometryParameters? {
         guard
-            let frame = namespace.insertionFrames[id]?[key],
-            let sourceFrame = namespace.insertionFrames[id]?[!key],
-            let sourceAnchor = namespace.insertionAnchors[id]?[!key] else {
+            let frame = namespace.insertionFrames[id]?[uuid],
+            let sourceFrame = namespace.insertionFrames[id]?.first(where: { $0.key != uuid })?.value,
+            let sourceAnchor = namespace.insertionAnchors[id]?.first(where: { $0.key != uuid })?.value else {
                 return nil
         }
         let params = MatchedGeometryParameters(

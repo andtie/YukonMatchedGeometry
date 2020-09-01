@@ -8,7 +8,8 @@
 import SwiftUI
 
 extension View {
-    public func matchedGeometryEffect<ID>(id: ID, in namespace: Namespace.ID, guid: String? = nil, properties: MatchedGeometryProperties = .frame, anchor: UnitPoint = .center, isSource: Bool = true) -> some View where ID: Hashable {
+    //swiftlint:disable:next identifier_name line_length
+    public func matchedGeometryEffect<ID>(id: ID, in namespace: Namespace.ID, properties: MatchedGeometryProperties = .frame, anchor: UnitPoint = .center, isSource: Bool = true) -> some View where ID: Hashable {
         let config = MatchedGeometryConfig(
             id: id,
             namespace: namespace,
@@ -17,12 +18,5 @@ extension View {
             isSource: isSource
         )
         return modifier(MatchedGeometryModifier(newConfig: config, oldConfig: config))
-    }
-}
-
-@available(iOS 14.0, *)
-extension View {
-    public func matchedGeometryEffect<ID>(id: ID, in namespace: SwiftUI.Namespace.ID, guid: String? = nil, properties: SwiftUI.MatchedGeometryProperties = .frame, anchor: UnitPoint = .center, isSource: Bool = true) -> some View where ID: Hashable {
-        matchedGeometryEffect(id: id, in: namespace, properties: properties, anchor: anchor, isSource: isSource)
     }
 }

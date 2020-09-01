@@ -15,26 +15,26 @@ struct MatchedGeometryModifier<ID: Hashable>: ViewModifier {
     @State var oldConfig: MatchedGeometryConfig<ID>
     /// The current frame, as read by the GeometryReader.
     @State private var frame: CGRect?
+    /// A unique id to identify the view in the shared namespace
+    @State private var uuid = UUID()
 
     func body(content: Content) -> some View {
-        newConfig.save(frame: frame)
-        let hasChanged = newConfig != oldConfig
-        let transitionParams = self.transitionParams()
-        return content
-            .modifier(MatchedGeometryAnimation(type: .default, params: params(newConfig), progress: hasChanged ? 0 : 1))
-            .modifier(MatchedGeometryAnimation(type: .default, params: params(oldConfig), progress: hasChanged ? 1 : 0))
+        content
+            .modifier(MatchedGeometryAnimation(progress: hasChanged ? 0 : 1, parameters: parameters(config: newConfig)))
+            .modifier(MatchedGeometryAnimation(progress: hasChanged ? 1 : 0, parameters: parameters(config: oldConfig)))
             .transition(
-                AnyTransition.opacity.combined(with:
-                    AnyTransition.asymmetric(
-                        insertion: .modifier(
-                            active: MatchedGeometryAnimation(type: .insertionActive, params: transitionParams, progress: 0),
-                            identity: MatchedGeometryAnimation(type: .insertionIdentity, params: transitionParams, progress: 1)
-                        ),
-                        removal: .modifier(
-                            active: MatchedGeometryAnimation(type: .removalActive, params: transitionParams, progress: 0),
-                            identity: MatchedGeometryAnimation(type: .removalIdentity, params: transitionParams, progress: 1)
+                AnyTransition.opacity.combined(
+                    with:
+                        AnyTransition.asymmetric(
+                            insertion: .modifier(
+                                active: MatchedGeometryAnimation(progress: 0, parameters: transitionParams),
+                                identity: MatchedGeometryAnimation(progress: 1, parameters: transitionParams)
+                            ),
+                            removal: .modifier(
+                                active: MatchedGeometryAnimation(progress: 0, parameters: transitionParams),
+                                identity: MatchedGeometryAnimation(progress: 1, parameters: transitionParams)
+                            )
                         )
-                    )
                 )
             )
             .overlay(
@@ -48,7 +48,7 @@ struct MatchedGeometryModifier<ID: Hashable>: ViewModifier {
                     self.frame = value
                 }
             )
-            .onPreferenceChange(AnimationTypePreference.self) { value in
+            .onAppear {
                 resetInsertion()
             }
             .onDisappear {
@@ -56,25 +56,26 @@ struct MatchedGeometryModifier<ID: Hashable>: ViewModifier {
             }
     }
 
+    var hasChanged: Bool {
+        newConfig != oldConfig
+    }
+
     func resetInsertion() {
         newConfig.namespace.insertionFrames[self.newConfig.id] = [:]
         newConfig.namespace.insertionAnchors[self.newConfig.id] = [:]
     }
 
-    func params(_ config: MatchedGeometryConfig<ID>) -> (Bool) -> MatchedGeometryParameters? {
-        /// we return a function s.t. the frame lookups occur at time of use
-        func wrapped(isRemoved: Bool) -> MatchedGeometryParameters? {
+    func parameters(config: MatchedGeometryConfig<ID>) -> () -> MatchedGeometryParameters? {
+        config.save(frame: frame)
+
+        func parameters() -> MatchedGeometryParameters? {
             config.parameters(for: frame)
         }
-        return wrapped
+        return parameters
     }
 
-    func transitionParams() -> (Bool) -> MatchedGeometryParameters? {
-        /// we return a function s.t. the frame lookups occur at time of use
-        func wrapped(isRemoved: Bool) -> MatchedGeometryParameters? {
-            newConfig.save(transitionFrame: frame, key: isRemoved)
-            return newConfig.transitionParameters(for: frame, key: isRemoved)
-        }
-        return wrapped
+    func transitionParams() -> MatchedGeometryParameters? {
+        newConfig.save(insertionFrame: frame, uuid: uuid)
+        return newConfig.transitionParameters(for: frame, uuid: uuid)
     }
 }
