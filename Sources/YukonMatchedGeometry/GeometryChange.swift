@@ -1,27 +1,24 @@
 //
-//  MatchedGeometryParameters.swift
+// GeometryChange.swift
 //  
-//
-//  Created by Tielmann, Andreas on 15.07.2020.
+// Created by Andreas in 2020
 //
 
 import SwiftUI
 
-struct MatchedGeometryParameters {
+struct GeometryChange {
 
     let frame: CGRect
     let sourceFrame: CGRect
-
     let anchor: UnitPoint
     let sourceAnchor: UnitPoint
-
     let properties: MatchedGeometryProperties
 
     var scaleAnchor: UnitPoint {
         properties.contains(.position) ? .center : .topLeading
     }
 
-    func scale(progress: CGFloat) -> CGSize {
+    func scale(_ progress: CGFloat) -> CGSize {
         guard properties.contains(.size) else {
             return CGSize(width: 1, height: 1)
         }
@@ -37,7 +34,7 @@ struct MatchedGeometryParameters {
         )
     }
 
-    func offset(progress: CGFloat) -> CGSize {
+    func offset(_ progress: CGFloat) -> CGSize {
         guard properties.contains(.position) else {
             return .zero
         }
@@ -58,7 +55,7 @@ struct MatchedGeometryParameters {
         )
     }
 
-    static let zero = MatchedGeometryParameters(
+    static let zero = GeometryChange(
         frame: .zero,
         sourceFrame: .zero,
         anchor: .center,
@@ -67,7 +64,7 @@ struct MatchedGeometryParameters {
     )
 }
 
-extension CGRect {
+private extension CGRect {
     func x(for anchor: UnitPoint) -> CGFloat {
         minX + width * anchor.x
     }

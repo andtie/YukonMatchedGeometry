@@ -12,12 +12,14 @@ let package = Package(
     products: [
         .library(
             name: "YukonMatchedGeometry",
-            targets: ["YukonMatchedGeometry"])
+            targets: ["YukonMatchedGeometry"]
+        )
     ],
     dependencies: [],
     targets: [
         .target(
             name: "YukonMatchedGeometry",
-            dependencies: [])
+            dependencies: []
+        )
     ]
 )

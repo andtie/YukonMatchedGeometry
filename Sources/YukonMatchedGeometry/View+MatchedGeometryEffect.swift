@@ -1,16 +1,24 @@
 //
-//  View+MatchedGeometryEffect.swift
+// View+MatchedGeometryEffect.swift
 //  
-//
-//  Created by Tielmann, Andreas on 07.07.2020.
+// Created by Andreas in 2020
 //
 
 import SwiftUI
 
 extension View {
-    //swiftlint:disable:next identifier_name line_length
+    /// A reimplementation of SwiftUIs MatchedGeometryEffect.
+    public func matchedGeometryEffect<ID>(id: ID, in namespace: YukonNamespace.ID, properties: MatchedGeometryProperties = .frame, anchor: UnitPoint = .center, isSource: Bool = true) -> some View where ID: Hashable {
+        modifier(GeometryModifier(GeometryConfig(id: id, properties: properties, anchor: anchor, isSource: isSource, matching: namespace)))
+    }
+
+    /// On iOS 14, this function falls back to the SwiftUI implementation.
+    @ViewBuilder
     public func matchedGeometryEffect<ID>(id: ID, in namespace: Namespace.ID, properties: MatchedGeometryProperties = .frame, anchor: UnitPoint = .center, isSource: Bool = true) -> some View where ID: Hashable {
-        let config = MatchedGeometryConfig(id: id, namespace: namespace, properties: properties, anchor: anchor, isSource: isSource)
-        return modifier(MatchedGeometryModifier(newConfig: config, oldConfig: config))
+        if #available(iOS 14, *) {
+            modifier(FallbackModifier(id: id, namespace: namespace, properties: properties, anchor: anchor, isSource: isSource))
+        } else {
+            modifier(GeometryModifier(GeometryConfig(id: id, properties: properties, anchor: anchor, isSource: isSource, matching: namespace)))
+        }
     }
 }

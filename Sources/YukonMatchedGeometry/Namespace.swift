@@ -1,26 +1,20 @@
 //
-//  Namespace.swift
+// Namespace.swift
 // 
+// Created by Andreas in 2020
 //
-//  Created by Tielmann, Andreas on 07.07.2020.
-//
 
-import SwiftUI
+import Foundation
 
-@propertyWrapper public struct Namespace: DynamicProperty {
-
-    // swiftlint:disable:next type_name
-    public class ID {
-        var sources = [AnyHashable: ViewInfo]()
-        var transitions = [AnyHashable: [UUID: ViewInfo]]()
-    }
-
+@propertyWrapper public struct Namespace {
+    public typealias ID = GeometryMatchingWithFallback
     public let wrappedValue = ID()
-
     public init() {}
+}
 
-    struct ViewInfo: Equatable {
-        let frame: CGRect
-        let anchor: UnitPoint
-    }
+/// Use this namespace if you do **not** want to use the SwiftUI implementation even on iOS 14.
+@propertyWrapper public struct YukonNamespace {
+    public typealias ID = GeometryMatching
+    public let wrappedValue = ID()
+    public init() {}
 }

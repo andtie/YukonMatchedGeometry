@@ -1,8 +1,7 @@
 //
-//  MatchedGeometryProperties.swift
+// MatchedGeometryProperties.swift
 // 
-//
-//  Created by Tielmann, Andreas on 07.07.2020.
+// Created by Andreas in 2020
 //
 
 import Foundation
