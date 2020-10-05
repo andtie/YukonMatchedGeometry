@@ -28,13 +28,12 @@ public class GeometryMatchingWithFallback: GeometryMatching {
     private var _id: Any?
 
     override func isEqual(to matching: GeometryMatching) -> Bool {
-        guard super.isEqual(to: matching),
-              let matching = matching as? GeometryMatchingWithFallback,
-              #available(iOS 14.0, *)
+        guard #available(iOS 14.0, *),
+              let fallback = matching as? GeometryMatchingWithFallback
         else {
-            return false
+            return super.isEqual(to: matching)
         }
-        return _id as? SwiftUI.Namespace.ID == matching._id as? SwiftUI.Namespace.ID
+        return _id as? SwiftUI.Namespace.ID == fallback._id as? SwiftUI.Namespace.ID
     }
 
     @available(iOS 14.0, *)
