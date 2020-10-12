@@ -15,7 +15,7 @@ struct GeometryChange {
     let properties: MatchedGeometryProperties
 
     var scaleAnchor: UnitPoint {
-        properties.contains(.position) ? .center : .topLeading
+        properties.contains(.position) ? anchor : .topLeading
     }
 
     func scale(_ progress: CGFloat) -> CGSize {
@@ -37,11 +37,6 @@ struct GeometryChange {
     func offset(_ progress: CGFloat) -> CGSize {
         guard properties.contains(.position) else {
             return .zero
-        }
-
-        var sourceFrame = self.sourceFrame
-        if !properties.contains(.frame) {
-            sourceFrame.size = frame.size
         }
 
         let interpolatedPoint = CGPoint(

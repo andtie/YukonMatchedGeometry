@@ -53,7 +53,9 @@ struct GeometryModifier<ID: Hashable>: ViewModifier {
     }
 
     func change(for config: GeometryConfig<ID>) -> () -> GeometryChange {
-        config.update(frame: frame)
+        if config == newConfig {
+            config.update(frame: frame)
+        }
         return { config.change(for: self.frame) }
     }
 
